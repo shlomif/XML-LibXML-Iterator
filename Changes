@@ -1,0 +1,4 @@
+Revision history for Perl extension XML::LibXML::Iterator.
+
+1.00  Fri Nov  8 2002
+    - extracted the modules from the main XML::LibXML bundle.
