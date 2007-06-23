@@ -1,4 +1,4 @@
-# $Id: Iterator.pm,v 1.1.1.1 2002/11/08 17:18:36 phish Exp $
+# 
 #
 package XML::LibXML::Iterator;
 
@@ -8,18 +8,14 @@ use XML::NodeFilter qw(:results);
 
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use overload
   '++' => sub { $_[0]->next; $_[0]; },
   '--' => sub { $_[0]->previous; $_[0]; },
   '<>' => sub {
       if ( wantarray ) {
-          my @rv = ();
-          while ( $_[0]->next ){
-              push @rv;
-          }
-          return @rv;
+          return $_[0]->_get_all;
       } else {
           return $_[0]->next
       };
@@ -207,6 +203,18 @@ sub default_iterator {
     }
 
     return $node;
+}
+
+# helper function for the <> operator
+# returns all nodes that have not yet been accessed 
+sub _get_all {
+    my $self = shift;
+    my @retval = ();
+    my $node;
+    while ( $node = $self->next() ) {
+        push @retval, $node; 
+    }
+    return @retval;
 }
 
 1;

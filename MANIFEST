@@ -6,3 +6,4 @@ MANIFEST
 README
 t/01basic.t
 test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

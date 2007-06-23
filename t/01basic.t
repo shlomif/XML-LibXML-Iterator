@@ -35,7 +35,15 @@ $iter->first;
 ok( $iter->current->nodeName, "test" );
 
 my $n = $iter->last;
-ok( $iter->current->nodeName, "text" );
+my $v;
+eval {$v = XML::LibXML::LIBXML_VERSION(); };
+
+if ( defined $v && $v > 20600 ) {
+   ok( $iter->current->nodeName, "#text" );
+}
+else {
+   ok( $iter->current->nodeName, "text" );
+}
 
 
 print "# LIST ITERATION\n";

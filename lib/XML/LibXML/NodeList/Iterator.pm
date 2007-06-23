@@ -13,9 +13,7 @@ use overload
   '--' => sub { $_[0]->previous; $_[0] },
   '<>'  =>  sub {
       if ( wantarray ) {
-          my @rv = ();
-          while ( $_[0]->next ){ push @rv,$_;}
-          return @rv;
+          return $_[0]->_get_all;
       } else {
           return $_[0]->next
       };
@@ -128,6 +126,18 @@ sub iterate  {
         $rv = $funcref->( $self, $_ );
     }
     return $rv;
+}
+
+# helper function for the <> operator
+# returns all nodes that have not yet been accessed 
+sub _get_all {
+    my $self = shift;
+    my @retval = ();
+    my $node;
+    while ( $node = $self->next() ) {
+        push @retval, $node; 
+    }
+    return @retval;
 }
 
 1;
