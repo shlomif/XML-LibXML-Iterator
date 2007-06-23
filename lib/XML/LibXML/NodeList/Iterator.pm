@@ -6,19 +6,13 @@ use strict;
 use XML::NodeFilter qw(:results);
 
 use vars qw($VERSION);
-$VERSION = "1.00";
+$VERSION = "1.02";
 
 use overload
-  '++' => sub { $_[0]->next;     $_[0]; },
-  '--' => sub { $_[0]->previous; $_[0] },
-  '<>'  =>  sub {
-      if ( wantarray ) {
-          return $_[0]->_get_all;
-      } else {
-          return $_[0]->next
-      };
-  },
-;
+    '++' => sub { $_[0]->nextNode();     $_[0]; },
+    '--' => sub { $_[0]->previousNode(); $_[0] },
+    '<>'  =>  sub {return wantarray ? $_[0]->_get_all :  $_[0]->nextNode(); },
+    ;
 
 sub new {
     my $class = shift;
@@ -27,7 +21,7 @@ sub new {
     if ( defined $list ) {
         $self = bless [
                        $list,
-                       0,
+                       -1,
                        [],
                       ], $class;
     }
@@ -84,7 +78,10 @@ sub last     {
 sub current  { return $_[0][0][$_[0][1]]; }
 sub index    { return $_[0][1]; }
 
-sub next     {
+sub next     { return $_[0]->nextNode(); }
+sub previous { return $_[0]->previousNode(); }
+
+sub nextNode     {
     if ( (scalar @{$_[0][0]}) <= ($_[0][1] + 1)) {
         return undef;
     }
@@ -100,7 +97,7 @@ sub next     {
     return $_[0][0]->[$_[0][1]];
 }
 
-sub previous {
+sub previousNode {
     if ( $_[0][1] <= 0 ) {
         return undef;
     }
@@ -159,7 +156,7 @@ XML::LibXML::NodeList::Iterator - Iteration Class for XML::LibXML XPath results
   my $iter= XML::LibXML::NodeList::Iterator->new( $nodelist );
 
   # more control on the flow
-  while ( $iter->next ) {
+  while ( $iter->nextNode ) {
       # do something
   }
 
@@ -181,11 +178,11 @@ L<XML::LibXML::NodeList>, L<XML::NodeFilter>, L<XML::LibXML::Iterator>
 
 =head1 AUTHOR
 
-Christian Glahn, E<lt>christian.glahn@uibk.ac.atE<gt>
+Christian Glahn, E<lt>phish@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-(c) 2002, Christian Glahn. All rights reserved.
+(c) 2002-2007, Christian Glahn. All rights reserved.
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

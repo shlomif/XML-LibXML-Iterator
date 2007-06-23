@@ -8,18 +8,12 @@ use XML::NodeFilter qw(:results);
 
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 use overload
-  '++' => sub { $_[0]->next; $_[0]; },
-  '--' => sub { $_[0]->previous; $_[0]; },
-  '<>' => sub {
-      if ( wantarray ) {
-          return $_[0]->_get_all;
-      } else {
-          return $_[0]->next
-      };
-  },
+  '++' => sub { $_[0]->nextNode(); $_[0]; },
+  '--' => sub { $_[0]->previousNode(); $_[0]; },
+  '<>' => sub { return wantarray ? $_[0]->_get_all() : $_[0]->nextNode(); },
 ;
 
 
@@ -32,7 +26,11 @@ sub new {
     my $self = bless {}, $class;
 
     $self->{FIRST} = $node;
-    $self->first;
+    # $self->first;
+
+    $self->{CURRENT} = undef;
+    $self->{INDEX} = -1;
+
     $self->{ITERATOR} = \&default_iterator;
 
     $self->{FILTERS} = [];
@@ -69,33 +67,48 @@ sub add_filter {
 sub current  { return $_[0]->{CURRENT}; }
 sub index    { return $_[0]->{INDEX}; }
 
-sub next     {
+sub next { return $_[0]->nextNode(); }
+sub previous { return $_[0]->previousNode(); }
+
+sub nextNode     {
     my $self = shift;
     my @filters = @{$self->{FILTERS}};
     my $node = undef;
-    my $fv = FILTER_SKIP;
-    unless ( scalar @filters > 0 ) {
-        $fv = FILTER_DECLINED;
-    }
-    while ( 1 ) {
-        $node = $self->{ITERATOR}->( $self, 1 );
-        last unless defined $node;
-        foreach my $f ( @filters ) {
-            $fv = $f->accept_node( $node );
-            last if $fv;
+    
+    if ( $self->{INDEX} != -1 ) {
+        my $fv = FILTER_SKIP;
+        unless ( scalar @filters > 0 ) {
+            $fv = FILTER_DECLINED;
         }
-        last if $fv == FILTER_ACCEPT or $fv == FILTER_DECLINED;
-    }
 
+        while ( 1 ) {
+            $node = $self->{ITERATOR}->( $self, 1 );
+            last unless defined $node;
+            foreach my $f ( @filters ) {
+                $fv = $f->accept_node( $node );
+                last if $fv;
+            }
+            last if $fv == FILTER_ACCEPT or $fv == FILTER_DECLINED;
+        }
+    }
+    else {
+        $node = $self->first();
+    }
+        
     if ( defined $node ) {
         $self->{CURRENT} = $node;
-        $self->{INDEX}++;
+        if ( $node->isSameNode( $self->{FIRST} ) ) {
+            $self->{INDEX} = 0;
+        }
+        else {
+            $self->{INDEX}++;
+        }
     }
 
     return $node;
 }
 
-sub previous {
+sub previousNode {
     my $self = shift;
     my @filters = @{$self->{FILTERS}};
     my $node = undef;
@@ -185,20 +198,26 @@ sub default_iterator {
         }
     }
     else {
-        return undef if $self->{CURRENT}->isSameNode( $self->{FIRST} )
-          and $self->{INDEX} > 0;
+        if ( defined $self->{CURRENT} ) {
+            return undef if $self->{CURRENT}->isSameNode( $self->{FIRST} )
+                and $self->{INDEX} > 0;
 
-        if ( $self->{CURRENT}->hasChildNodes ) {
-            $node = $self->{CURRENT}->firstChild;
+            if ( $self->{CURRENT}->hasChildNodes ) {
+                $node = $self->{CURRENT}->firstChild;
+            }
+            else {
+                $node = $self->{CURRENT}->nextSibling;
+                my $pnode = $self->{CURRENT}->parentNode;
+                while ( not defined $node ) {
+                    last unless defined $pnode;
+                    $node = $pnode->nextSibling;
+                    $pnode = $pnode->parentNode unless defined $node;
+                }
+            }
         }
         else {
-            $node = $self->{CURRENT}->nextSibling;
-            my $pnode = $self->{CURRENT}->parentNode;
-            while ( not defined $node ) {
-                last unless defined $pnode;
-                $node = $pnode->nextSibling;
-                $pnode = $pnode->parentNode unless defined $node;
-            }
+            $self->{CURRENT} = $self->{FIRST};
+            $node = $self->{CURRENT};
         }
     }
 
@@ -235,15 +254,15 @@ XML::LibXML::Iterator - XML::LibXML's Tree Iteration Class
   my $doc = XML::LibXML->new->parse_string( $somedata );
   my $iter= XML::LibXML::Iterator->new( $doc );
 
-  $iter->iterator_function( \&iterate );
+  $iter->iterator_function( \&iterator_function );
 
   # more control on the flow
-  while ( $iter->next ) {
+  while ( $iter->nextNode ) {
       # do something
   }
 
   # operate on the entire tree
-  $iter->iterate( \&operate );
+  $iter->iterate( \&callback_function );
 
 =head1 DESCRIPTION
 
@@ -272,11 +291,11 @@ Therefore an iterator has three basic functions:
 
 =over 4
 
-=item * next()
+=item * nextNode()
 
 =item * current()
 
-=item * previous()
+=item * previousNode()
 
 =back
 
@@ -310,7 +329,7 @@ The following example may clearify this:
   my $iter = XML::LibXML::Iterator->new( $doc->documentElement );
 
   # walk through the document
-  while ( $iter->next() ) {
+  while ( $iter->nextNode() ) {
      my $curnode = $iter->current();
      print $curnode->nodeType();
   }
@@ -320,13 +339,13 @@ The following example may clearify this:
   my $curnode = $iter->current();
   print $curnode->nodeType();
 
-Actually the functions next(), previous(), first(), last() and
+Actually the functions nextNode(), previousNode(), first(), last() and
 current() do return the node which is current after the
-operation. E.g. next() moves to the next node if possible and then
+operation. E.g. nextNode() moves to the next node if possible and then
 returns the node. Thus the while-loop in the example can be written
 as
 
-  while ( $iter->next() ) {
+  while ( $iter->nextNode() ) {
      print $_->nodeType();
   }
 
@@ -424,9 +443,9 @@ attributes in a given subtree.
 
 =item first()
 
-=item next()
+=item nextNode()
 
-=item previous()
+=item previousNode()
 
 =item last()
 
@@ -450,11 +469,11 @@ L<XML::LibXML::Node>, L<XML::NodeFilter>
 
 =head1 AUTHOR
 
-Christian Glahn, E<lt>christian.glahn@uibk.ac.atE<gt>
+Christian Glahn, E<lt>phish@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-(c) 2002, Christian Glahn. All rights reserved.
+(c) 2002-2007, Christian Glahn. All rights reserved.
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
