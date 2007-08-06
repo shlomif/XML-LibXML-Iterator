@@ -1,5 +1,8 @@
 Revision history for Perl extension XML::LibXML::Iterator.
 
+1.03 Mon Aug 06 2007
+    - fixed RT#28688 by using the provided patch
+
 1.02  Sat Jun 23 2007
     - fixed RT#6873
     - cleaned up the tests

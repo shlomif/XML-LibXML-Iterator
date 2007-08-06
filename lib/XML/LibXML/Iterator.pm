@@ -8,7 +8,7 @@ use XML::NodeFilter qw(:results);
 
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 use overload
   '++' => sub { $_[0]->nextNode(); $_[0]; },

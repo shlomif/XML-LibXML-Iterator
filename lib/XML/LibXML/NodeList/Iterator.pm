@@ -6,7 +6,7 @@ use strict;
 use XML::NodeFilter qw(:results);
 
 use vars qw($VERSION);
-$VERSION = "1.02";
+$VERSION = "1.03";
 
 use overload
     '++' => sub { $_[0]->nextNode();     $_[0]; },
@@ -20,10 +20,10 @@ sub new {
     my $self  = undef;
     if ( defined $list ) {
         $self = bless [
-                       $list,
-                       -1,
-                       [],
-                      ], $class;
+            $list,
+            -1,
+            [],
+            ], $class;
     }
 
     return $self;
@@ -49,19 +49,21 @@ sub accept_node {
     return FILTER_ACCEPT;
 }
 
-sub first    { $_[0][1]=0;
-               my $s = scalar(@{$_[0][0]});
-               while ( $_[0][1] < $s ) {
-                   last if $_[0]->accept_node($_[0][0][$_[0][1]]) == FILTER_ACCEPT;
-                   $_[0][1]++;
-               }
-               return undef if $_[0][1] == $s;
-               return $_[0][0][$_[0][1]]; }
+sub first    {
+    $_[0][1]=0;
+    my $s = scalar(@{$_[0][0]});
+    while ( $_[0][1] < $s ) {
+        last if $_[0]->accept_node($_[0][0][$_[0][1]]) == FILTER_ACCEPT;
+        $_[0][1]++;
+    }
+    return undef if $_[0][1] == $s;
+    return $_[0][0][$_[0][1]]; 
+}
 
 sub last     {
     my $i = scalar(@{$_[0][0]})-1;
     while($i >= 0){
-        if ( $_[0]->accept_node($_[0][0][$i] == FILTER_ACCEPT) ) {
+        if ( $_[0]->accept_node($_[0][0][$i]) == FILTER_ACCEPT ) {
             $_[0][1] = $i;
             last;
         }
