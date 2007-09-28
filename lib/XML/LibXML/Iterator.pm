@@ -8,7 +8,7 @@ use XML::NodeFilter qw(:results);
 
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 use overload
   '++' => sub { $_[0]->nextNode(); $_[0]; },
@@ -430,7 +430,7 @@ iteration, the internal position will be reset to the first node.
 
 The following example will show how this works:
 
-  $iter->iterate( sub {shift; map {$_->setNodeName( lc $_->nodeName ) if $_->nodeType != NAMESPACE_DECLARATION } ($_[0], $_[0]->attributes);  } );
+  $iter->iterate( sub {my ($iter,$node)=@_; map {$iter->setNodeName( lc $iter->nodeName ) if $iter->nodeType != NAMESPACE_DECLARATION } ($node, $node->attributes);  } );
 
 This extra long line lowercases all tagnames and the names of the
 attributes in a given subtree.

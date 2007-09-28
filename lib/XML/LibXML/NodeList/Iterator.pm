@@ -77,20 +77,34 @@ sub last     {
     return $_[0][0][$i];
 }
 
-sub current  { return $_[0][0][$_[0][1]]; }
-sub index    { return $_[0][1]; }
+sub current  { 
+    if ( $_[0][1] >= 0 || $_[0][1] < scalar @{$_[0][0]} ) {
+        return $_[0][0][$_[0][1]]; 
+    }
+    return undef;
+}
+
+sub index    { 
+    if ( $_[0][1] >= 0 || $_[0][1] < scalar @{$_[0][0]} ) {
+        return $_[0][1]; 
+    }
+    return undef;
+}
 
 sub next     { return $_[0]->nextNode(); }
 sub previous { return $_[0]->previousNode(); }
 
 sub nextNode     {
-    if ( (scalar @{$_[0][0]}) <= ($_[0][1] + 1)) {
+    my $nlen = scalar @{$_[0][0]};
+    if ( $nlen <= ($_[0][1] + 1)) {
         return undef;
     }
     my $i = $_[0][1];
+    $i = -1 if $i < 0; # assure that we end up with the first 
+                       # element in the first iteration
     while ( 1 ) {
         $i++;
-        return undef if $i >= scalar @{$_[0][0]};
+        return undef if $i >= $nlen;
         if ( $_[0]->accept_node( $_[0][0]->[$i] ) == FILTER_ACCEPT ) {
             $_[0][1] = $i;
             last;
@@ -118,11 +132,13 @@ sub previousNode {
 sub iterate  {
     my $self = shift;
     my $funcref = shift;
-    return unless defined $funcref && ref( $funcref ) eq 'CODE';
-    $self->[1] = -1;
     my $rv;
-    while ( $self->next ) {
-        $rv = $funcref->( $self, $_ );
+
+    return unless defined $funcref && ref( $funcref ) eq 'CODE';
+
+    $self->[1] = -1; # first element
+    while ( my $node = $self->next ) {
+        $rv = $funcref->( $self, $node );
     }
     return $rv;
 }

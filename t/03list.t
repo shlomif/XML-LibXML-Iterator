@@ -1,7 +1,7 @@
 use Test;
 
 
-BEGIN { plan tests => 8; }
+BEGIN { plan tests => 9; }
 
 use XML::LibXML;
 use XML::LibXML::NodeList::Iterator;
@@ -307,3 +307,36 @@ sub t08_last_with_filter {
 ok(t08_last_with_filter());
 
 # END RT#28688
+
+# RT#29262
+
+sub t09_pass_nodes {
+    my $doc = XML::LibXML->new->parse_string( '<a><b/><c/></a>' );
+
+    my $nodelist = $doc->findnodes('/a/*');
+    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist );
+    
+    my $i = 0;
+    my $cstr = '';
+    $iterator->iterate( sub { my($s, $n) = @_; 
+                              if ( defined $n && $n->can('nodeName') ) {
+                                  $i++;
+                                  $cstr.=$n->nodeName();
+                              }
+                        });
+
+    unless ( $i == 2 ) {
+        print "# wrong number of nodes has been processed! $i\n";
+        return 0;
+    }
+    unless ( $cstr eq 'bc' ) {
+        print "# wrong nodes have been processed! '$cstr'\n";
+        return 0;
+    }
+    
+    return 1;
+}
+
+ok(t09_pass_nodes());
+
+# END RT#29262
