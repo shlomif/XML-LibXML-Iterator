@@ -57,7 +57,7 @@ sub first    {
         $_[0][1]++;
     }
     return undef if $_[0][1] == $s;
-    return $_[0][0][$_[0][1]]; 
+    return $_[0][0][$_[0][1]];
 }
 
 sub last     {
@@ -77,16 +77,16 @@ sub last     {
     return $_[0][0][$i];
 }
 
-sub current  { 
+sub current  {
     if ( $_[0][1] >= 0 || $_[0][1] < scalar @{$_[0][0]} ) {
-        return $_[0][0][$_[0][1]]; 
+        return $_[0][0][$_[0][1]];
     }
     return undef;
 }
 
-sub index    { 
+sub index    {
     if ( $_[0][1] >= 0 || $_[0][1] < scalar @{$_[0][0]} ) {
-        return $_[0][1]; 
+        return $_[0][1];
     }
     return undef;
 }
@@ -100,7 +100,7 @@ sub nextNode     {
         return undef;
     }
     my $i = $_[0][1];
-    $i = -1 if $i < 0; # assure that we end up with the first 
+    $i = -1 if $i < 0; # assure that we end up with the first
                        # element in the first iteration
     while ( 1 ) {
         $i++;
@@ -144,13 +144,13 @@ sub iterate  {
 }
 
 # helper function for the <> operator
-# returns all nodes that have not yet been accessed 
+# returns all nodes that have not yet been accessed
 sub _get_all {
     my $self = shift;
     my @retval = ();
     my $node;
     while ( $node = $self->next() ) {
-        push @retval, $node; 
+        push @retval, $node;
     }
     return @retval;
 }
@@ -189,6 +189,38 @@ but on a XML::LibXML::NodeList object. Because XML::LibXML::NodeList
 is basically an array the functionality of
 XML::LibXML::NodeList::Iterator is more restircted to stepwise
 foreward and backward than XML::LibXML::Iterator is.
+
+=head1 METHODS
+
+=over 4
+
+=item * accept_node
+
+=item * add_filter
+
+=item * current
+
+=item * first
+
+=item * index
+
+=item * iterate
+
+=item * last
+
+=item * new
+
+=item * next
+
+=item * nextNode
+
+=item * previous
+
+=item * previousNode
+
+=item * set_filter
+
+=back
 
 =head1 SEE ALSO
 

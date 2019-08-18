@@ -11,13 +11,13 @@ eval { $libversion = XML::LibXML::LIBXML_VERSION(); };
 
 sub t01_tree_first_element {
     my $doc = XML::LibXML->new->parse_string( '<test><n1/><n2/></test>');
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
 
-    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement ); 
+    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement );
 
     my $node = $iterator->nextNode();
 
@@ -27,10 +27,10 @@ sub t01_tree_first_element {
     }
 
     unless ( $node->nodeName() eq 'test' ) {
-        print "# expected 'test' received '" . $node->nodeName() . "'\n"; 
+        print "# expected 'test' received '" . $node->nodeName() . "'\n";
         return 0;
     }
-    
+
     return 1;
 }
 
@@ -38,13 +38,13 @@ ok(t01_tree_first_element());
 
 sub t06_set_first {
     my $doc = XML::LibXML->new->parse_string( $xmlstr );
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
 
-    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement ); 
+    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement );
 
     $iterator->first();
 
@@ -52,7 +52,7 @@ sub t06_set_first {
         print "# there is no first node\n";
         return 0;
     }
-    
+
     unless ( $iterator->current()->nodeName() eq "A" ) {
         print "# expected nodeName 'A' received '"
             . $iterator->current()->nodeName()
@@ -66,13 +66,13 @@ ok(t06_set_first());
 
 sub t07_set_last {
     my $doc = XML::LibXML->new->parse_string( $xmlstr );
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
 
-    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement ); 
+    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement );
 
     $iterator->last();
 
@@ -80,7 +80,7 @@ sub t07_set_last {
         print "# there is no last node\n";
         return 0;
     }
-    
+
     unless ( $iterator->current()->nodeName() eq "D" ) {
         print "# expected nodeName 'D' received '"
             . $iterator->current()->nodeName()
@@ -95,13 +95,13 @@ ok(t07_set_last());
 
 sub t02_loop_forward {
     my $doc = XML::LibXML->new->parse_string( $xmlstr );
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
 
-    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement ); 
+    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement );
 
     my $i = 0;
 
@@ -130,7 +130,7 @@ sub t02_loop_forward {
         print "# wen out of scope\n";
         return 0;
     }
-    
+
     unless ( $iterator->current()->nodeName() eq "D" ) {
         print "# expected nodeName 'D' received '"
             . $iterator->current()->nodeName()
@@ -144,13 +144,13 @@ ok(t02_loop_forward());
 
 sub t03_loop_backward {
     my $doc = XML::LibXML->new->parse_string( $xmlstr );
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
 
-    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement ); 
+    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement );
 
     my $i = 0;
 
@@ -170,13 +170,13 @@ ok(t03_loop_backward());
 
 sub t04_loop_forward_backward {
     my $doc = XML::LibXML->new->parse_string( $xmlstr );
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
 
-    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement ); 
+    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement );
 
     my $i = 0;
 
@@ -186,7 +186,7 @@ sub t04_loop_forward_backward {
     while ( $iterator->previousNode() ) {
         $i++;
     }
-    
+
     unless ( $i == 11 ) {
         print "# expected 11 iterations done " . $i . "\n";
         return 0;
@@ -210,13 +210,13 @@ ok(t04_loop_forward_backward());
 
 sub t05_run_iterate {
     my $doc = XML::LibXML->new->parse_string( $xmlstr );
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
 
-    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement ); 
+    my $iterator = XML::LibXML::Iterator->new( $doc->documentElement );
 
     my $i = 0;
     $iterator->iterate( sub { $i++; } );

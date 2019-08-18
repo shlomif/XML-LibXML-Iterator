@@ -1,4 +1,4 @@
-# 
+#
 #
 package XML::LibXML::Iterator;
 
@@ -74,7 +74,7 @@ sub nextNode     {
     my $self = shift;
     my @filters = @{$self->{FILTERS}};
     my $node = undef;
-    
+
     if ( $self->{INDEX} != -1 ) {
         my $fv = FILTER_SKIP;
         unless ( scalar @filters > 0 ) {
@@ -94,7 +94,7 @@ sub nextNode     {
     else {
         $node = $self->first();
     }
-        
+
     if ( defined $node ) {
         $self->{CURRENT} = $node;
         if ( $node->isSameNode( $self->{FIRST} ) ) {
@@ -225,13 +225,13 @@ sub default_iterator {
 }
 
 # helper function for the <> operator
-# returns all nodes that have not yet been accessed 
+# returns all nodes that have not yet been accessed
 sub _get_all {
     my $self = shift;
     my @retval = ();
     my $node;
     while ( $node = $self->next() ) {
-        push @retval, $node; 
+        push @retval, $node;
     }
     return @retval;
 }
@@ -435,31 +435,37 @@ The following example will show how this works:
 This extra long line lowercases all tagnames and the names of the
 attributes in a given subtree.
 
-=head2 Functions
+=head1 METHODS
 
 =over 4
 
-=item new($first_node)
+=item * new($first_node)
 
-=item first()
+=item * default_iterator
 
-=item nextNode()
+=item * first()
 
-=item previousNode()
+=item * next()
 
-=item last()
+=item * nextNode()
 
-=item current()
+=item * previous()
 
-=item index()
+=item * previousNode()
 
-=item iterator_function($funcion_ref)
+=item * last()
 
-=item set_filter(@filter_list)
+=item * current()
 
-=item add_filter(@filter_list)
+=item * index()
 
-=item iterate($function_ref)
+=item * iterator_function($funcion_ref)
+
+=item * set_filter(@filter_list)
+
+=item * add_filter(@filter_list)
+
+=item * iterate($function_ref)
 
 =back
 

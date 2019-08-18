@@ -10,14 +10,14 @@ my $xmlstr = "<A><B/><B/>T<C><D/></C></A>";
 
 sub t01_list_first_element {
     my $doc = XML::LibXML->new->parse_string( '<test><n1/><n2/></test>');
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
 
     my $nodelist = $doc->findnodes( '/test/*' );
-    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist ); 
+    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist );
 
     my $node = $iterator->next();
 
@@ -27,10 +27,10 @@ sub t01_list_first_element {
     }
 
     unless ( $node->nodeName() eq 'n1' ) {
-        print "# expected 'n1' received '" . $node->nodeName() . "'\n"; 
+        print "# expected 'n1' received '" . $node->nodeName() . "'\n";
         return 0;
     }
-    
+
     return 1;
 }
 
@@ -38,14 +38,14 @@ ok(t01_list_first_element());
 
 sub t06_set_first {
     my $doc = XML::LibXML->new->parse_string( $xmlstr );
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
-    
+
     my $nodelist = $doc->findnodes( '//A | //B | //C' );
-    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist ); 
+    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist );
 
     $iterator->first();
 
@@ -53,7 +53,7 @@ sub t06_set_first {
         print "# there is no first node\n";
         return 0;
     }
-    
+
     unless ( $iterator->current()->nodeName() eq "A" ) {
         print "# expected nodeName 'A' received '"
             . $iterator->current()->nodeName()
@@ -67,14 +67,14 @@ ok(t06_set_first());
 
 sub t07_set_last {
     my $doc = XML::LibXML->new->parse_string( $xmlstr );
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
 
     my $nodelist = $doc->findnodes( '//A | //B | //C' );
-    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist ); 
+    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist );
 
     $iterator->last();
 
@@ -82,7 +82,7 @@ sub t07_set_last {
         print "# there is no last node\n";
         return 0;
     }
-    
+
     unless ( $iterator->current()->nodeName() eq "C" ) {
         print "# expected nodeName 'C' received '"
             . $iterator->current()->nodeName()
@@ -97,13 +97,13 @@ ok(t07_set_last());
 
 sub t02_loop_forward {
     my $doc = XML::LibXML->new->parse_string( $xmlstr );
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
     my $nodelist = $doc->findnodes( '//A|//B|//C' );
-    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist ); 
+    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist );
 
     my $i = 0;
 
@@ -120,7 +120,7 @@ sub t02_loop_forward {
         print "# wen out of scope\n";
         return 0;
     }
-    
+
     unless ( $iterator->current()->nodeName() eq "C" ) {
         print "# expected nodeName 'C' received '"
             . $iterator->current()->nodeName()
@@ -144,7 +144,7 @@ sub t02_loop_forward {
         print "# wen out of scope\n";
         return 0;
     }
-    
+
     unless ( $iterator->current()->nodeName() eq "C" ) {
         print "# expected nodeName 'C' received '"
             . $iterator->current()->nodeName()
@@ -158,14 +158,14 @@ ok(t02_loop_forward());
 
 sub t03_loop_backward {
     my $doc = XML::LibXML->new->parse_string( $xmlstr );
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
 
     my $nodelist = $doc->findnodes( '//A | //B | //C' );
-    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist ); 
+    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist );
 
     my $i = 0;
 
@@ -196,14 +196,14 @@ ok(t03_loop_backward());
 
 sub t04_loop_forward_backward {
     my $doc = XML::LibXML->new->parse_string( $xmlstr );
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
 
     my $nodelist = $doc->findnodes( '//A | //B | //C' );
-    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist ); 
+    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist );
 
     my $i = 0;
 
@@ -213,7 +213,7 @@ sub t04_loop_forward_backward {
     while ( $iterator->previousNode() ) {
         $i++;
     }
-    
+
     unless ( $i == 7 ) {
         print "# expected 7 iterations done " . $i . "\n";
         return 0;
@@ -237,14 +237,14 @@ ok(t04_loop_forward_backward());
 
 sub t05_run_iterate {
     my $doc = XML::LibXML->new->parse_string( $xmlstr );
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
 
     my $nodelist = $doc->findnodes( '//A | //B | //C' );
-    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist ); 
+    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist );
 
     my $i = 0;
     $iterator->iterate( sub { $i++; } );
@@ -278,14 +278,14 @@ package main;
 
 sub t08_last_with_filter {
     my $doc = XML::LibXML->new->parse_string( $xmlstr );
-    
+
     unless ( defined $doc ) {
         print "# XML string was not parsed properly\n";
         return 0;
     }
 
     my $nodelist = $doc->findnodes( '//*' );
-    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist ); 
+    my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist );
     $iterator->add_filter( MyFilter->new() );
 
     $iterator->last();
@@ -294,7 +294,7 @@ sub t08_last_with_filter {
         print "# there is no last node\n";
         return 0;
     }
-    
+
     unless ( $iterator->current()->nodeName() eq "D" ) {
         print "# expected nodeName 'D' received '"
             . $iterator->current()->nodeName()
@@ -315,10 +315,10 @@ sub t09_pass_nodes {
 
     my $nodelist = $doc->findnodes('/a/*');
     my $iterator = XML::LibXML::NodeList::Iterator->new( $nodelist );
-    
+
     my $i = 0;
     my $cstr = '';
-    $iterator->iterate( sub { my($s, $n) = @_; 
+    $iterator->iterate( sub { my($s, $n) = @_;
                               if ( defined $n && $n->can('nodeName') ) {
                                   $i++;
                                   $cstr.=$n->nodeName();
@@ -333,7 +333,7 @@ sub t09_pass_nodes {
         print "# wrong nodes have been processed! '$cstr'\n";
         return 0;
     }
-    
+
     return 1;
 }
 
