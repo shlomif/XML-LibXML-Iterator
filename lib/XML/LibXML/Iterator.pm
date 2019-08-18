@@ -11,13 +11,13 @@ use vars qw($VERSION);
 $VERSION = '1.04';
 
 use overload
-  '++' => sub { $_[0]->nextNode(); $_[0]; },
-  '--' => sub { $_[0]->previousNode(); $_[0]; },
-  '<>' => sub { return wantarray ? $_[0]->_get_all() : $_[0]->nextNode(); },
-;
+    '++' => sub { $_[0]->nextNode();     $_[0]; },
+    '--' => sub { $_[0]->previousNode(); $_[0]; },
+    '<>' => sub { return wantarray ? $_[0]->_get_all() : $_[0]->nextNode(); },
+    ;
 
-
-sub new {
+sub new
+{
     my $class = shift;
     my $node  = shift;
 
@@ -26,10 +26,11 @@ sub new {
     my $self = bless {}, $class;
 
     $self->{FIRST} = $node;
+
     # $self->first;
 
     $self->{CURRENT} = undef;
-    $self->{INDEX} = -1;
+    $self->{INDEX}   = -1;
 
     $self->{ITERATOR} = \&default_iterator;
 
@@ -38,69 +39,82 @@ sub new {
     return $self;
 }
 
-
-sub iterator_function {
+sub iterator_function
+{
     my $self = shift;
     my $func = shift;
 
-    return if defined $func and ref( $func ) ne "CODE";
+    return if defined $func and ref($func) ne "CODE";
 
     $self->first;
-    if ( defined $func ) {
+    if ( defined $func )
+    {
         $self->{ITERATOR} = $func;
     }
-    else {
+    else
+    {
         $self->{ITERATOR} = \&default_iterator;
     }
 }
 
-sub set_filter {
+sub set_filter
+{
     my $self = shift;
-    $self->{FILTERS} = [ @_ ];
+    $self->{FILTERS} = [@_];
 }
 
-sub add_filter {
+sub add_filter
+{
     my $self = shift;
-    push @{$self->{FILTERS}}, @_;
+    push @{ $self->{FILTERS} }, @_;
 }
 
-sub current  { return $_[0]->{CURRENT}; }
-sub index    { return $_[0]->{INDEX}; }
+sub current { return $_[0]->{CURRENT}; }
+sub index   { return $_[0]->{INDEX}; }
 
-sub next { return $_[0]->nextNode(); }
+sub next     { return $_[0]->nextNode(); }
 sub previous { return $_[0]->previousNode(); }
 
-sub nextNode     {
-    my $self = shift;
-    my @filters = @{$self->{FILTERS}};
-    my $node = undef;
+sub nextNode
+{
+    my $self    = shift;
+    my @filters = @{ $self->{FILTERS} };
+    my $node    = undef;
 
-    if ( $self->{INDEX} != -1 ) {
+    if ( $self->{INDEX} != -1 )
+    {
         my $fv = FILTER_SKIP;
-        unless ( scalar @filters > 0 ) {
+        unless ( scalar @filters > 0 )
+        {
             $fv = FILTER_DECLINED;
         }
 
-        while ( 1 ) {
+        while (1)
+        {
             $node = $self->{ITERATOR}->( $self, 1 );
             last unless defined $node;
-            foreach my $f ( @filters ) {
-                $fv = $f->accept_node( $node );
+            foreach my $f (@filters)
+            {
+                $fv = $f->accept_node($node);
                 last if $fv;
             }
             last if $fv == FILTER_ACCEPT or $fv == FILTER_DECLINED;
         }
     }
-    else {
+    else
+    {
         $node = $self->first();
     }
 
-    if ( defined $node ) {
+    if ( defined $node )
+    {
         $self->{CURRENT} = $node;
-        if ( $node->isSameNode( $self->{FIRST} ) ) {
+        if ( $node->isSameNode( $self->{FIRST} ) )
+        {
             $self->{INDEX} = 0;
         }
-        else {
+        else
+        {
             $self->{INDEX}++;
         }
     }
@@ -108,25 +122,30 @@ sub nextNode     {
     return $node;
 }
 
-sub previousNode {
-    my $self = shift;
-    my @filters = @{$self->{FILTERS}};
-    my $node = undef;
-    my $fv = FILTER_SKIP;
-    unless ( scalar @filters > 0 ) {
+sub previousNode
+{
+    my $self    = shift;
+    my @filters = @{ $self->{FILTERS} };
+    my $node    = undef;
+    my $fv      = FILTER_SKIP;
+    unless ( scalar @filters > 0 )
+    {
         $fv = FILTER_DECLINED;
     }
-    while ( 1 ) {
+    while (1)
+    {
         $node = $self->{ITERATOR}->( $self, -1 );
         last unless defined $node;
-        foreach my $f ( @filters ) {
-            $fv = $f->accept_node( $node );
+        foreach my $f (@filters)
+        {
+            $fv = $f->accept_node($node);
             last if $fv;
         }
         last if $fv == FILTER_ACCEPT or $fv == FILTER_DECLINED;
     }
 
-    if ( defined $node ) {
+    if ( defined $node )
+    {
         $self->{CURRENT} = $node;
         $self->{INDEX}--;
     }
@@ -134,88 +153,105 @@ sub previousNode {
     return $node;
 }
 
-sub first {
+sub first
+{
     my $self = shift;
-    if ( scalar @_ ) {
+    if ( scalar @_ )
+    {
         $self->{FIRST} = shift;
     }
 
     $self->{CURRENT} = $self->{FIRST};
 
     # this logic is required if the node is not allowed to be shown
-    my @filters = @{$self->{FILTERS}||[]};
-    my $fv = FILTER_DECLINED;
+    my @filters = @{ $self->{FILTERS} || [] };
+    my $fv      = FILTER_DECLINED;
 
-    foreach my $f ( @filters ) {
+    foreach my $f (@filters)
+    {
         $fv = $f->accept_node( $self->{CURRENT} );
         last if $fv;
     }
 
     $fv ||= FILTER_ACCEPT;
 
-    unless ( $fv == FILTER_ACCEPT ) {
+    unless ( $fv == FILTER_ACCEPT )
+    {
         return undef;
     }
 
-    $self->{INDEX}   = 0;
+    $self->{INDEX} = 0;
     return $self->current;
 }
 
-sub last  {
+sub last
+{
     my $self = shift;
-    while ($self->next) {}
+    while ( $self->next ) { }
     return $self->current;
 }
 
-sub iterate {
-    my $self = shift;
+sub iterate
+{
+    my $self     = shift;
     my $function = shift;
-    return unless defined $function and ref( $function ) eq 'CODE' ;
+    return unless defined $function and ref($function) eq 'CODE';
     my $rv;
     my $node = $self->first;
-    while ( $node ) {
-        $rv = $function->($self,$node);
+    while ($node)
+    {
+        $rv   = $function->( $self, $node );
         $node = $self->next;
     }
     return $rv;
 }
 
-sub default_iterator {
+sub default_iterator
+{
     my $self = shift;
     my $dir  = shift;
     my $node = undef;
 
-
-    if ( $dir < 0 ) {
-        return undef if $self->{CURRENT}->isSameNode( $self->{FIRST} )
-          and $self->{INDEX} <= 0;
+    if ( $dir < 0 )
+    {
+        return undef
+            if $self->{CURRENT}->isSameNode( $self->{FIRST} )
+            and $self->{INDEX} <= 0;
 
         $node = $self->{CURRENT}->previousSibling;
         return $self->{CURRENT}->parentNode unless defined $node;
 
-        while ( $node->hasChildNodes ) {
+        while ( $node->hasChildNodes )
+        {
             $node = $node->lastChild;
         }
     }
-    else {
-        if ( defined $self->{CURRENT} ) {
-            return undef if $self->{CURRENT}->isSameNode( $self->{FIRST} )
+    else
+    {
+        if ( defined $self->{CURRENT} )
+        {
+            return undef
+                if $self->{CURRENT}->isSameNode( $self->{FIRST} )
                 and $self->{INDEX} > 0;
 
-            if ( $self->{CURRENT}->hasChildNodes ) {
+            if ( $self->{CURRENT}->hasChildNodes )
+            {
                 $node = $self->{CURRENT}->firstChild;
             }
-            else {
+            else
+            {
                 $node = $self->{CURRENT}->nextSibling;
                 my $pnode = $self->{CURRENT}->parentNode;
-                while ( not defined $node ) {
+                while ( not defined $node )
+                {
                     last unless defined $pnode;
-                    $node = $pnode->nextSibling;
+                    $node  = $pnode->nextSibling;
                     $pnode = $pnode->parentNode unless defined $node;
                 }
             }
         }
-        else {
+        else
+        {
             $self->{CURRENT} = $self->{FIRST};
             $node = $self->{CURRENT};
         }
@@ -226,11 +262,13 @@ sub default_iterator {
 
 # helper function for the <> operator
 # returns all nodes that have not yet been accessed
-sub _get_all {
-    my $self = shift;
+sub _get_all
+{
+    my $self   = shift;
     my @retval = ();
     my $node;
-    while ( $node = $self->next() ) {
+    while ( $node = $self->next() )
+    {
         push @retval, $node;
     }
     return @retval;

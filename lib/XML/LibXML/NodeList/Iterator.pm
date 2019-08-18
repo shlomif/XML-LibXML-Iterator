@@ -11,81 +11,94 @@ $VERSION = "1.03";
 use overload
     '++' => sub { $_[0]->nextNode();     $_[0]; },
     '--' => sub { $_[0]->previousNode(); $_[0] },
-    '<>'  =>  sub {return wantarray ? $_[0]->_get_all :  $_[0]->nextNode(); },
+    '<>' => sub { return wantarray ? $_[0]->_get_all : $_[0]->nextNode(); },
     ;
 
-sub new {
+sub new
+{
     my $class = shift;
     my $list  = shift;
     my $self  = undef;
-    if ( defined $list ) {
-        $self = bless [
-            $list,
-            -1,
-            [],
-            ], $class;
+    if ( defined $list )
+    {
+        $self = bless [ $list, -1, [], ], $class;
     }
 
     return $self;
 }
 
-sub set_filter {
+sub set_filter
+{
     my $self = shift;
-    $self->[2] = [ @_ ];
+    $self->[2] = [@_];
 }
 
-sub add_filter {
+sub add_filter
+{
     my $self = shift;
-    push @{$self->[2]}, @_;
+    push @{ $self->[2] }, @_;
 }
 
 # helper function.
-sub accept_node {
-    foreach ( @{$_[0][2]} ) {
-        my $r = $_->accept_node($_[1]);
+sub accept_node
+{
+    foreach ( @{ $_[0][2] } )
+    {
+        my $r = $_->accept_node( $_[1] );
         return $r if $r;
     }
+
     # no filters or all decline ...
     return FILTER_ACCEPT;
 }
 
-sub first    {
-    $_[0][1]=0;
-    my $s = scalar(@{$_[0][0]});
-    while ( $_[0][1] < $s ) {
-        last if $_[0]->accept_node($_[0][0][$_[0][1]]) == FILTER_ACCEPT;
+sub first
+{
+    $_[0][1] = 0;
+    my $s = scalar( @{ $_[0][0] } );
+    while ( $_[0][1] < $s )
+    {
+        last if $_[0]->accept_node( $_[0][0][ $_[0][1] ] ) == FILTER_ACCEPT;
         $_[0][1]++;
     }
     return undef if $_[0][1] == $s;
-    return $_[0][0][$_[0][1]];
+    return $_[0][0][ $_[0][1] ];
 }
 
-sub last     {
-    my $i = scalar(@{$_[0][0]})-1;
-    while($i >= 0){
-        if ( $_[0]->accept_node($_[0][0][$i]) == FILTER_ACCEPT ) {
+sub last
+{
+    my $i = scalar( @{ $_[0][0] } ) - 1;
+    while ( $i >= 0 )
+    {
+        if ( $_[0]->accept_node( $_[0][0][$i] ) == FILTER_ACCEPT )
+        {
             $_[0][1] = $i;
             last;
         }
         $i--;
     }
 
-    if ( $i < 0 ) {
+    if ( $i < 0 )
+    {
         # this costs a lot, but is more safe
         return $_[0]->first;
     }
     return $_[0][0][$i];
 }
 
-sub current  {
-    if ( $_[0][1] >= 0 || $_[0][1] < scalar @{$_[0][0]} ) {
-        return $_[0][0][$_[0][1]];
+sub current
+{
+    if ( $_[0][1] >= 0 || $_[0][1] < scalar @{ $_[0][0] } )
+    {
+        return $_[0][0][ $_[0][1] ];
     }
     return undef;
 }
 
-sub index    {
-    if ( $_[0][1] >= 0 || $_[0][1] < scalar @{$_[0][0]} ) {
+sub index
+{
+    if ( $_[0][1] >= 0 || $_[0][1] < scalar @{ $_[0][0] } )
+    {
         return $_[0][1];
     }
     return undef;
@@ -94,50 +107,60 @@ sub index    {
 sub next     { return $_[0]->nextNode(); }
 sub previous { return $_[0]->previousNode(); }
 
-sub nextNode     {
-    my $nlen = scalar @{$_[0][0]};
-    if ( $nlen <= ($_[0][1] + 1)) {
+sub nextNode
+{
+    my $nlen = scalar @{ $_[0][0] };
+    if ( $nlen <= ( $_[0][1] + 1 ) )
+    {
         return undef;
     }
     my $i = $_[0][1];
-    $i = -1 if $i < 0; # assure that we end up with the first
-                       # element in the first iteration
-    while ( 1 ) {
+    $i = -1 if $i < 0;    # assure that we end up with the first
+                          # element in the first iteration
+    while (1)
+    {
         $i++;
         return undef if $i >= $nlen;
-        if ( $_[0]->accept_node( $_[0][0]->[$i] ) == FILTER_ACCEPT ) {
+        if ( $_[0]->accept_node( $_[0][0]->[$i] ) == FILTER_ACCEPT )
+        {
             $_[0][1] = $i;
             last;
         }
     }
-    return $_[0][0]->[$_[0][1]];
+    return $_[0][0]->[ $_[0][1] ];
 }
 
-sub previousNode {
-    if ( $_[0][1] <= 0 ) {
+sub previousNode
+{
+    if ( $_[0][1] <= 0 )
+    {
         return undef;
     }
     my $i = $_[0][1];
-    while ( 1 ) {
+    while (1)
+    {
         $i--;
         return undef if $i < 0;
-        if ( $_[0]->accept_node( $_[0][0]->[$i] ) == FILTER_ACCEPT ) {
+        if ( $_[0]->accept_node( $_[0][0]->[$i] ) == FILTER_ACCEPT )
+        {
             $_[0][1] = $i;
             last;
         }
     }
-    return $_[0][0][$_[0][1]];
+    return $_[0][0][ $_[0][1] ];
 }
 
-sub iterate  {
-    my $self = shift;
+sub iterate
+{
+    my $self    = shift;
     my $funcref = shift;
     my $rv;
 
-    return unless defined $funcref && ref( $funcref ) eq 'CODE';
+    return unless defined $funcref && ref($funcref) eq 'CODE';
 
-    $self->[1] = -1; # first element
-    while ( my $node = $self->next ) {
+    $self->[1] = -1;    # first element
+    while ( my $node = $self->next )
+    {
         $rv = $funcref->( $self, $node );
     }
     return $rv;
@@ -145,11 +168,13 @@ sub iterate  {
 
 # helper function for the <> operator
 # returns all nodes that have not yet been accessed
-sub _get_all {
-    my $self = shift;
+sub _get_all
+{
+    my $self   = shift;
     my @retval = ();
     my $node;
-    while ( $node = $self->next() ) {
+    while ( $node = $self->next() )
+    {
         push @retval, $node;
     }
     return @retval;
