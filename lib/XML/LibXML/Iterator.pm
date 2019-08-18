@@ -267,7 +267,7 @@ XML::LibXML::Iterator - XML::LibXML's Tree Iteration Class
 =head1 DESCRIPTION
 
 XML::LibXML::Iterator is an iterator class for XML::LibXML parsed
-documents. This class allows to iterate the document tree as it were a
+documents. This class allows one to iterate the document tree as it were a
 linear data structure. It is possible to step back and forth between
 the nodes of the tree and do certain operations on that
 nodes. Different to XPath the nodes are not prefetched but will be
@@ -310,7 +310,7 @@ In short: An iterator will answer the question about what to do next.
 
 XML::LibXML::Iterator requires a parsed document or at least a node to
 operate on. This node is passed to the iterator class and will be used
-as the B<first> node of the iteration. One can allways reset the
+as the B<first> node of the iteration. One can always reset the
 iterator to the first node by using the first()-function.
 
 Once XML::LibXML::Iterator is initialized the tree can be traversed by
@@ -320,7 +320,7 @@ XML::LibXML::Node object if there is such object available.
 Since the current object hold by the iterator class is always
 available via the current() function.
 
-The following example may clearify this:
+The following example may clarify this:
 
   # get the document from wherever you like
   my $doc = XML::LibXML->new->parse_stream( *SOMEINPUT );
@@ -376,14 +376,14 @@ accessed is given by the following order:
 
 In combination with XML::Nodefilter this is best for a wide range of
 scripts and applications. Nevertheless this is still to restrictive
-for some applications. XML::LibXML::Iterator allows to change that
+for some applications. XML::LibXML::Iterator allows one to change that
 behaviour. This is done by resetting XML::LibXML::Iterator's iterator
 function. By using the method iterator_function() to override the
 default iterator function, it is possible to implement iterations
 based on any iteration rule imaginable.
 
 A valid iterator function has to take two parameters: As the first
-parameter it will recieve the iterator object itself, as second the
+parameter it will receive the iterator object itself, as second the
 direction of the iteration will be passed. The direction is either 1
 (for next()) or -1 (for previous()). As the iterator-function is
 called by next() and previous() the interator-function has to be aware
@@ -420,7 +420,7 @@ function therefore will look like this:
 
 Another feature of XML::LibXML::Iterator is the ability to repeat a
 single operation on all nodes in scope. Instead of writing a loop one
-can specify the opeation as a function, that it applied on each node
+can specify the operation as a function, that it applied on each node
 found. The function that does the trick, is named iterate().
 
 iterate() takes again two parameter: First the iterator object, second

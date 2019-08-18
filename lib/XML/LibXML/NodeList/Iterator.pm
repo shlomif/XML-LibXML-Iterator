@@ -186,7 +186,7 @@ XML::LibXML::NodeList::Iterator - Iteration Class for XML::LibXML XPath results
 XML::LibXML::NodeList::Iterator is very similar to
 XML::LibXML::Iterator, but it does not iterate on the tree structure
 but on a XML::LibXML::NodeList object. Because XML::LibXML::NodeList
-is basicly an array the functionality of
+is basically an array the functionality of
 XML::LibXML::NodeList::Iterator is more restircted to stepwise
 foreward and backward than XML::LibXML::Iterator is.
 
