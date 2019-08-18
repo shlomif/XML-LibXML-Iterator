@@ -1,6 +1,6 @@
-Revision history for Perl extension XML::LibXML::Iterator.
+history for Perl extension XML::LibXML::Iterator.
 
-1.05    2019-08-17
+1.05    2019-08-18
     - Fix spelling errors - thanks to Debian.
         - https://rt.cpan.org/Ticket/Display.html?id=125837 .
     - Convert to http://dzil.org/ .
