@@ -3,6 +3,7 @@
 package XML::LibXML::Iterator;
 
 use strict;
+use warnings;
 
 use XML::NodeFilter qw(:results);
 
@@ -10,11 +11,13 @@ use vars qw($VERSION);
 
 $VERSION = '1.04';
 
+## no critic
 use overload
     '++' => sub { $_[0]->nextNode();     $_[0]; },
     '--' => sub { $_[0]->previousNode(); $_[0]; },
     '<>' => sub { return wantarray ? $_[0]->_get_all() : $_[0]->nextNode(); },
     ;
+## use critic
 
 sub new
 {
@@ -44,7 +47,7 @@ sub iterator_function
     my $self = shift;
     my $func = shift;
 
-    return if defined $func and ref($func) ne "CODE";
+    return undef() if defined $func and ref($func) ne "CODE";
 
     $self->first;
     if ( defined $func )
@@ -195,7 +198,7 @@ sub iterate
 {
     my $self     = shift;
     my $function = shift;
-    return unless defined $function and ref($function) eq 'CODE';
+    return undef() unless defined $function and ref($function) eq 'CODE';
     my $rv;
     my $node = $self->first;
     while ($node)

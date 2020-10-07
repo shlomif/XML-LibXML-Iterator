@@ -3,16 +3,20 @@
 package XML::LibXML::NodeList::Iterator;
 
 use strict;
+use warnings;
+
 use XML::NodeFilter qw(:results);
 
 use vars qw($VERSION);
 $VERSION = "1.03";
 
+## no critic
 use overload
     '++' => sub { $_[0]->nextNode();     $_[0]; },
     '--' => sub { $_[0]->previousNode(); $_[0] },
     '<>' => sub { return wantarray ? $_[0]->_get_all : $_[0]->nextNode(); },
     ;
+## use critic
 
 sub new
 {
@@ -156,7 +160,7 @@ sub iterate
     my $funcref = shift;
     my $rv;
 
-    return unless defined $funcref && ref($funcref) eq 'CODE';
+    return () unless defined $funcref && ref($funcref) eq 'CODE';
 
     $self->[1] = -1;    # first element
     while ( my $node = $self->next )
